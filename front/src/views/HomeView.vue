@@ -26,7 +26,7 @@ export default {
       }
       cancelTokenSource = axios.CancelToken.source();
       try {
-
+        users.value = []
         message.value = 'Загрузка';
         const response = await axios.post('http://localhost:3000/search', {
           email: data.email,
