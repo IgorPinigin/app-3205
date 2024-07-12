@@ -1,13 +1,9 @@
 cd front
 npm install
+npm run serve
 
 cd ../back
 npm install
-
-front:
-cd front
-npm run serve
-
-back:
-cd ../back
 npm run start
+
+
