@@ -1,9 +1,13 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import fs from 'fs';
+import { User } from './types/User';
+import dotenv from 'dotenv'
+
+dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
 
 app.use(express.json());
 
@@ -16,28 +20,20 @@ app.use((req, res, next) => {
     next();
 });
 
-interface User {
-    email: string;
-    number: string;
-}
-let currentTimeout:any = null
 
 app.post('/search', (req, res) => {
 
     const users: User[] = JSON.parse(fs.readFileSync('users.json', 'utf-8')); 
     const { email, number } = req.body;
-    let results = users.filter(user => user.email.includes(email));
-    if (number) {
-        results = results.filter(user => user.number.includes(number));
-    }
+    let results = users.filter(user => {
+        const emailMatch = user.email.includes(email);
+        const numberMatch = !number || user.number.includes(number);
+        return emailMatch && numberMatch;
+    });
 
-    if (currentTimeout) {
-        clearTimeout(currentTimeout);
-    }
-
-    currentTimeout = setTimeout(()=>{
+    setTimeout(()=>{
         res.json(results)
-    },5001)
+    },5000)
  
 });
 

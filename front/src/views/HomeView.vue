@@ -1,13 +1,13 @@
 <template>
   <UserForm @send="searchUser"/>
   {{ message }}
-  <div class="user-card" v-for="user in users">
+  <div class="user-card" v-for="user in users" :key="user.email">
     {{ user.email }} : {{ user.number }}
   </div>
 </template>
 
 <script>
-
+import { ref } from 'vue';
 import axios from "axios";
 import UserForm from "../components/UserForm.vue"
 export default {
@@ -15,33 +15,46 @@ export default {
   components: {
     UserForm
   },
-  data(){
-    return{
-      message: '',
-      users: []
-    }
-  },
-  methods:{
-    async searchUser(data){
+  setup() {
+    const message = ref('');
+    const users = ref([]);
+    let cancelTokenSource = null;
+
+    const searchUser = async (data) => {
+      if (cancelTokenSource) {
+        cancelTokenSource.cancel('Operation canceled due to new request.');
+      }
+      cancelTokenSource = axios.CancelToken.source();
       try {
+
+        message.value = 'Загрузка';
         const response = await axios.post('http://localhost:3000/search', {
           email: data.email,
           number: data.number
+        },{
+          cancelToken: cancelTokenSource.token
         });
-        this.users = []
-        for (let i = 0; i < response.data.length; i++) {
-          this.users.push({
-            email: response.data[i].email,
-            number: response.data[i].number
-          })
-        }
-        if(this.users.length == 0){
-          this.message = 'Нет пользователей с такими данными!'
+        
+        users.value = response.data;
+        message.value = '';
+        if (users.value.length === 0) {
+          message.value = 'Нет пользователей с такими данными!';
         }
       } catch (error) {
-        this.message = 'Ошибка запроса';
+        if (axios.isCancel(error)) {
+          
+        }else{
+          message.value = 'Ошибка запроса: ' + error;
+        }
+        
       }
-    }
+    };
+
+    return {
+      message,
+      users,
+      searchUser
+    };
   }
 };
 </script>

@@ -14,29 +14,31 @@
 </template>
 
 <script>
+import { ref } from 'vue';
 import { MaskInput } from 'vue-3-mask';
-export default{
-  data() {
-    return {
-      email: '',
-      number: '',
-      errorMessage: '',
-      mask: '######'
-    };
-  },
-  components:{
+export default {
+  name: "UserForm",
+  components: {
     MaskInput
   },
-  methods:{
-    handleSubmit(){
-      this.number = this.number.replace(/-/g,'')
-      this.$emit('send', { email: this.email, number: this.number })
-    },
+  setup(props, { emit }) {
+    const email = ref('');
+    const number = ref('');
+    const errorMessage = ref('');
+    const mask = ref('######');
+
+    const handleSubmit = () => {
+      number.value = number.value.replace(/-/g, '');
+      emit('send', { email: email.value, number: number.value });
+    };
+
+    return {
+      email,
+      number,
+      errorMessage,
+      mask,
+      handleSubmit
+    };
   }
-}
-  
+};
 </script>
-
-<style lang="scss" scoped>
-
-</style>
