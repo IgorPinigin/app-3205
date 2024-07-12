@@ -1,9 +1,12 @@
-cd front
-npm install
-npm run serve
+## Front
 
-cd ../back
-npm install
-npm run start
+cd front  
+npm install  
+npm run serve  
+
+## Back
+cd ../back  
+npm install  
+npm run start  
 
 
